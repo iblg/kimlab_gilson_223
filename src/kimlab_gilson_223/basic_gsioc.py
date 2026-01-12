@@ -15,6 +15,7 @@
 import sys
 import ctypes
 from ctypes import *
+from time import sleep
 
 #-----------------------------------------------------------------------
 # Returns the dll version from the Gsioc32.dll
@@ -117,7 +118,8 @@ def buffered(unitid, command):
 #   argv[3] is the command
 # main(sys.argv[1], int(sys.argv[2]), sys.argv[3])
 
-def run(cmd: str, cmd_type: str = 'b', unit_id: int = 10, show_command_sent=False, show_response=True):
+def run(cmd: str, cmd_type: str = 'b', unit_id: int = 10, show_command_sent=False, show_response=True, sleep_before=1):
+	sleep(sleep_before)
 	if cmd_type == 'i':
 		resp = immediate(unit_id, cmd)
 	elif cmd_type == 'b':
@@ -131,6 +133,8 @@ def run(cmd: str, cmd_type: str = 'b', unit_id: int = 10, show_command_sent=Fals
 	
 	if show_response:
 		print(str(resp))
+
+	return resp
 
 def main():
 	cmd_type = 'b'
