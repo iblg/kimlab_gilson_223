@@ -198,11 +198,11 @@ def go_to_needle_rinse(z_height=135, execute: bool = False) -> tuple[str, str]:
 def main():
 
     run('H')
-    wait_until_movement_completes()
-    # go_to_needle_rinse(execute=True)
-    run(go_to_needle_rinse(execute=False))
+    # wait_until_movement_completes()
+    # # go_to_needle_rinse(execute=True)
+    # run(go_to_needle_rinse(execute=False))
 
-    # run('H')
+    # # run('H')
     return
 
 if __name__ == '__main__':
