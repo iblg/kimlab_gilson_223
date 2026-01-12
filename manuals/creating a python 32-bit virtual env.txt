@@ -1,0 +1,25 @@
+Notes on creating a task.
+
+I have so far created GSIOC-related tasks.
+In this case, the only time it has worked is if Instrument Name is specified (as "Liquid Handler" or as "Pump") along with the ID (10 or 30, respectively).
+
+Do not modify methods while one is running! I did this and apparently caused a crash!
+
+
+C:\Users\uvcom\AppData\Local\Programs\Python\Python313-32
+I downloaded a python executable from python.org and ran the following.
+"/c/Users/uvcom/Downloads/python-3.13.5.exe" -m venv py313-32
+I made sure to check "Add to path". This placed the python executable file at
+C:\Users\uvcom\AppData\Local\Programs\Python\Python313-32
+
+I then created a directory at
+Users/uvcom/dev/py313-32 and navigated there.
+I then ran  "C:/Users/uvcom/AppData/Local/Programs/Python/Python313-32/python.exe" -m venv py313-32-env
+
+to create an environment.
+
+I activated it by navigating there and running
+source path/to/env/Scripts/activate
+
+and deactivated it by doing
+deactivate
