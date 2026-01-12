@@ -118,15 +118,66 @@ def buffered(unitid, command):
 #   argv[3] is the command
 # main(sys.argv[1], int(sys.argv[2]), sys.argv[3])
 
-def run(cmd: str, cmd_type: str = 'b', unit_id: int = 10, show_command_sent=False, show_response=True, sleep_before=1):
+def run(cmd: str | tuple[str], 
+		cmd_type: str = 'b', 
+		unit_id: int = 10, 
+		show_command_sent: bool = False, 
+		show_response: bool = True, 
+		sleep_before: float = 0.5):
+	"""
+	Run a command, or a tuple of commands
+
+	cmd: str or tuple of str
+	The commands that you want to pass to the instrument.
+
+	cmd_type: str, default 'b'
+	The command type. Should be 'b' or 'i' for buffered or immediate. Buffered commands are passed to the instrument to make it actually do something
+	(such as move). Immediate commands are commands that return information about the current state of the instrument.
+
+	unit_id: int, default 10
+	The unit id is a unique number assigned to the instrument in GSIOC, which is the connection protocol provided by GIlson.
+	By default, the 223 autosampler is 10. The Minipuls3 pump is 30. It is not recommended to change this default.
+
+	show_command_sent: bool, default False
+	If true, prompts the Python program to echo the command sent to the instruments.
+
+	show_response: bool, default True
+	If true, prompts the Python program to echo the response received from the instrument.
+
+	sleep_before: float, default 0.5
+	The time (in seconds) to wait before running the command. This is done to prevent crashes and miscommunications.
+	"""
 	sleep(sleep_before)
-	if cmd_type == 'i':
-		resp = immediate(unit_id, cmd)
-	elif cmd_type == 'b':
-		resp = buffered(unit_id, cmd)
+
+	def check_command_type(cmd_type):
+		if cmd_type in ('i', 'b'):
+			return True
+		else:
+			print('Incorrect command type. The only allowed command types are \'b\' for buffered commands and \'i\' for immediate commands.')
+			print('Buffered commands tell the instrument to do something. Immediate commands tell the instrument to give diagnostic info like current location.')
+			return False
+	
+	if check_command_type(cmd_type):
+		pass
 	else:
-		print('Incorrect command type. The only allowed command types are \'b\' for buffered commands and \'i\' for immediate commands.')
-		print('Buffered commands tell the instrument to do something. Immediate commands tell the instrument to give diagnostic info like current location.')
+		return
+
+	if isinstance(cmd, str):
+		if cmd_type == 'i':
+			resp = immediate(unit_id, cmd)
+		else:
+			resp = buffered(unit_id, cmd)
+
+	elif isinstance(cmd, tuple):
+		resp = []
+		if cmd_type == 'i':
+			for i in cmd:
+				resp.append(immediate(unit_id, i))
+		else:
+			for i in cmd:
+				resp.append(buffered(unit_id, i))
+	else:
+		pass
 
 	if show_command_sent:
 		print('Command input: cmd = {}, cmd_type: {}, unit_id: {}'.format(cmd, cmd_type, unit_id))
