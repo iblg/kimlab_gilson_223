@@ -77,7 +77,7 @@ def get_xy_position() -> tuple[int, int]:
 def move_to_z(z: int, speed: int = 4) -> int:
     """
     z: int
-    Desired z height in mm.
+    Desired z height in mm. Must be between 92 and 215. 215 = highest. 95 = lowest
 
     speed: int
     Speed setting (1=slowest, 5=fastest. Default = 4.)
@@ -115,22 +115,92 @@ def wait_until_movement_completes(sleep_time: float = 0.1) -> None:
         sleep(sleep_time)
     return
 
+
+def go_to_well(nx: int, ny: int) -> str:
+    """
+    Go to well, numbered by x and y indices.
+    1-indexed!
+    ***Assumes a 4x22 rack arrangement***
+
+    """
+    def check_nx():
+        nx_lims = (1, 16)
+        if nx >= nx_lims[0] and nx <= nx_lims[1]:
+            return True
+        else:
+            return False
+    
+    def check_ny():
+        ny_lims = (1, 11)
+        if ny >= ny_lims[0] and ny <= ny_lims[1]:
+            return True
+        else:
+            return False
+    
+    def get_x_from_index(idx):
+        nx0 = 1
+        nx1 = 16
+        x0 = 14
+        x1 = 315
+        slope = (x1-x0) / (nx1-nx0)
+        x = slope * (idx - nx0) + x0
+        return x
+    
+    def get_y_from_index(idx):
+        ny0 = 1
+        ny1 = 11
+        y0 = 38
+        y1 = 234
+        slope = (y1-y0) / (ny1-ny0)
+        y = slope * (idx - ny0) + y0
+        return y
+
+    if check_nx():
+        pass
+    else:
+        return
+    
+    if check_ny():
+        pass
+    else:
+        return
+    
+    x = int(get_x_from_index(nx))
+    y = int(get_y_from_index(ny))
+
+    cmd_string = move_to_xy(x,y)
+    return cmd_string
+
+def go_to_drain(execute: bool = False) -> tuple[str, str]:
+
+    cmd_str = move_to_xy(68,2)
+    z_str = move_to_z(195)
+
+    if execute:
+        run(cmd_str)
+        wait_until_movement_completes()
+        run(z_str)
+
+    return cmd_str, z_str
+
+def go_to_needle_rinse(z_height=135, execute: bool = False) -> tuple[str, str]:
+    cmd_str = move_to_xy(83,2)
+    if z_height == 'top':
+        z_str = move_to_z(215, speed=2)
+    z_str = move_to_z(z_height, speed=2)
+    if execute:
+        run(cmd_str)
+        wait_until_movement_completes()
+        run(z_str)
+    return cmd_str, z_str
+
+
 def main():
-    default_sleep = 1 # set a default time offset between when it moves
 
-    run(move_to_home())
+    run('H')
     wait_until_movement_completes()
-    
-    get_xy_position()
-    
-
-    run(move_to_xy(100, 100), show_command_sent=True)
-    wait_until_movement_completes()
-
-
-    current_xy = get_xy_position()
-    print('Current xy position is: {}'.format(current_xy))
-
+    # go_to_needle_rinse(execute=True)
+    run(go_to_needle_rinse(execute=False))
 
     # run('H')
     return
