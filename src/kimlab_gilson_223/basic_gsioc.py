@@ -152,14 +152,17 @@ def run(cmd: str | tuple[str],
 	sleep_before: float, default 0.5
 	The time (in seconds) to wait before running the command. This is done to prevent crashes and miscommunications.
 	"""
+	print('sleeping {} seconds'.format(sleep_before))
 	sleep(sleep_before)
+
 
 	def check_command_type(cmd_type):
 		if cmd_type in ('i', 'b'):
 			return True
 		else:
 			print('Incorrect command type. The only allowed command types are \'b\' for buffered commands and \'i\' for immediate commands.')
-			print('Buffered commands tell the instrument to do something. Immediate commands tell the instrument to give diagnostic info like current location.')
+			print('Buffered commands tell the instrument to do something. ' \
+			      'Immediate commands tell the instrument to give info about the state of the instrument.')
 			return False
 	
 	if check_command_type(cmd_type):
