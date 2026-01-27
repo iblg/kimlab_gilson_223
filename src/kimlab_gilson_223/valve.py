@@ -1,7 +1,10 @@
 from basic_gsioc import run
 from minipuls_pump import pump, set_pump_rpm, set_pump_to_mode, stop_pump
 from time import sleep
+from logging import log_command, save_log_entries
+from datetime import datetime
 
+@log_command
 def set_valve(direction: str | int, execute: bool = False, unit_id: int = 10):
     """
     Sets the Gilson diverting valve to either its position 0, away from the instrument, or 1, towards the instrument.
@@ -58,17 +61,28 @@ def set_valve(direction: str | int, execute: bool = False, unit_id: int = 10):
     return cmd_str
 
 def main():
+    # log_entries = []
+    now = datetime.now()
+
+    # path_to_file = Path('~/OneDrive/Desktop/gilson223_logs')
+    filename = now.strftime("%Y-%m-%d_%H-%M-%S") + '.csv'
+    path_to_file = 'C:/Users/uvcom/OneDrive/Desktop/gilson223_logs/' + filename
+
+
+    sleep_time = 3
     PUMP_ID = 30
     run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
     run(set_pump_rpm(20), unit_id=PUMP_ID)
     run(pump('f'), unit_id=30)
     run(set_valve('away'))
     run(set_valve(0))
-    sleep(10)
+    sleep(sleep_time)
     run(set_valve('toward'))
-    sleep(10)
-    run(stop_pump(), unit_id=PUMP_ID)
+    sleep(sleep_time)
+    run('KH', unit_id=PUMP_ID)
     run(set_pump_to_mode('manual'))
+    save_log_entries()
+    
     return
 
 if __name__ == '__main__':
