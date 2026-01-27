@@ -1,6 +1,13 @@
 from basic_gsioc import run
 from time import sleep
 
+######################
+# This code requires a 32-bit distribution of python to work.
+# On the Kim Lab Lenovo, this is activated by running
+# micromamba activate gsioc-win-32 since the environment is named gsioc-win-32
+# ENV = gsioc-win-32
+######################
+
 def get_motor_statuses():
     status = run('M', cmd_type='i')
     return status
@@ -196,13 +203,15 @@ def go_to_needle_rinse(z_height=135, execute: bool = False) -> tuple[str, str]:
 
 
 def main():
+    run(move_to_home())
+    # run('H')
+    wait_until_movement_completes()
+    run(go_to_needle_rinse(execute=False))
+    wait_until_movement_completes()
 
-    run('H')
-    # wait_until_movement_completes()
-    # # go_to_needle_rinse(execute=True)
-    # run(go_to_needle_rinse(execute=False))
+    run(move_to_home())
+    wait_until_movement_completes()
 
-    # # run('H')
     return
 
 if __name__ == '__main__':
