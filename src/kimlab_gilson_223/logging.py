@@ -7,7 +7,7 @@ import functools
 log_entries = []
 now = datetime.datetime.now()
 filename = 'C:/Users/uvcom/OneDrive/Desktop/gilson223_logs/'+ now.strftime("%Y-%m-%d_%H-%M-%S") + ".csv"
-print(f"Log will be saved to {filename}\n")
+print(f"\nLog will be saved to \n{filename}\n")
 
 # Define the decorator
 def log_command(func):
