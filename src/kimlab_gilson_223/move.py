@@ -7,12 +7,12 @@ from time import sleep
 # ENV = gsioc-win-32
 ######################
 
-# @log_command
+
 def get_motor_statuses():
     status = run('M', cmd_type='i')
     return status
 
-# @log_command
+
 def move_to_xy(x: int, y: int, move_z_to_top_before_running: bool = True) -> str:
     """
     x: desired x location, in mm
@@ -57,11 +57,10 @@ def move_to_xy(x: int, y: int, move_z_to_top_before_running: bool = True) -> str
     cmd_string = 'X' + str(x) + '0/' + str(y) + '0' # convert into tenths of millimeters (hence the extra zeros) and return the string.
     return cmd_string
 
-# @log_command
+
 def move_z_to_top() -> str:
     return 'Z2150' # 2150 tenths of mm is the top z height
 
-# @log_command
 def get_z_position() -> int:
     """
     Gets z position in mm
@@ -71,7 +70,7 @@ def get_z_position() -> int:
     z = int(float(z)/ 10)
     return z
 
-# @log_command
+
 def get_xy_position() -> tuple[int, int]:
     """
     Gets x,y position in mm. Returns as a tuple.
@@ -85,7 +84,7 @@ def get_xy_position() -> tuple[int, int]:
     y = int(float(y)/10)
     return (x,y)
 
-# @log_command
+
 def move_to_z(z: int, speed: int = 4) -> int:
     """
     z: int
@@ -112,7 +111,7 @@ def move_to_z(z: int, speed: int = 4) -> int:
         return cmd_string
     
 
-# @log_command
+
 def move_to_home() -> str:
     '''
     Convenience function to replace the less clear "H" function.
@@ -120,7 +119,7 @@ def move_to_home() -> str:
 
     return 'H'
 
-# @log_command
+
 def wait_until_movement_completes(sleep_time: float = 0.1) -> None:
     """
     Queries the current status of the motors. If any of them are running, sleeps for sleep_time seconds.
@@ -130,63 +129,7 @@ def wait_until_movement_completes(sleep_time: float = 0.1) -> None:
     return
 
 
-# @log_command
-def go_to_well(nx: int, ny: int) -> str:
-    """
-    Go to well, numbered by x and y indices.
-    1-indexed!
-    ***Assumes a 4x22 rack arrangement***
 
-    """
-    def check_nx():
-        nx_lims = (1, 16)
-        if nx >= nx_lims[0] and nx <= nx_lims[1]:
-            return True
-        else:
-            return False
-    
-    def check_ny():
-        ny_lims = (1, 11)
-        if ny >= ny_lims[0] and ny <= ny_lims[1]:
-            return True
-        else:
-            return False
-    
-    def get_x_from_index(idx):
-        nx0 = 1
-        nx1 = 16
-        x0 = 14
-        x1 = 315
-        slope = (x1-x0) / (nx1-nx0)
-        x = slope * (idx - nx0) + x0
-        return x
-    
-    def get_y_from_index(idx):
-        ny0 = 1
-        ny1 = 11
-        y0 = 38
-        y1 = 234
-        slope = (y1-y0) / (ny1-ny0)
-        y = slope * (idx - ny0) + y0
-        return y
-
-    if check_nx():
-        pass
-    else:
-        return
-    
-    if check_ny():
-        pass
-    else:
-        return
-    
-    x = int(get_x_from_index(nx))
-    y = int(get_y_from_index(ny))
-
-    cmd_string = move_to_xy(x,y)
-    return cmd_string
-
-# @log_command
 def go_to_drain(execute: bool = False) -> tuple[str, str]:
 
     cmd_str = move_to_xy(68,2)
@@ -199,7 +142,7 @@ def go_to_drain(execute: bool = False) -> tuple[str, str]:
 
     return cmd_str, z_str
 
-# @log_command
+
 def go_to_needle_rinse(z_height=135, execute: bool = False) -> tuple[str, str]:
     cmd_str = move_to_xy(83,2)
     if z_height == 'top':
