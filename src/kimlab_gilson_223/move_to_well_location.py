@@ -1,6 +1,5 @@
 from basic_gsioc import run
 from time import sleep
-from logging import log_command, save_log_entries
 ######################
 # This code requires a 32-bit distribution of python to work.
 # On the Kim Lab Lenovo, this is activated by running
@@ -8,12 +7,12 @@ from logging import log_command, save_log_entries
 # ENV = gsioc-win-32
 ######################
 
-@log_command
+# @log_command
 def get_motor_statuses():
     status = run('M', cmd_type='i')
     return status
 
-@log_command
+# @log_command
 def move_to_xy(x: int, y: int, move_z_to_top_before_running: bool = True) -> str:
     """
     x: desired x location, in mm
@@ -58,11 +57,11 @@ def move_to_xy(x: int, y: int, move_z_to_top_before_running: bool = True) -> str
     cmd_string = 'X' + str(x) + '0/' + str(y) + '0' # convert into tenths of millimeters (hence the extra zeros) and return the string.
     return cmd_string
 
-@log_command
+# @log_command
 def move_z_to_top() -> str:
     return 'Z2150' # 2150 tenths of mm is the top z height
 
-@log_command
+# @log_command
 def get_z_position() -> int:
     """
     Gets z position in mm
@@ -72,7 +71,7 @@ def get_z_position() -> int:
     z = int(float(z)/ 10)
     return z
 
-@log_command
+# @log_command
 def get_xy_position() -> tuple[int, int]:
     """
     Gets x,y position in mm. Returns as a tuple.
@@ -86,7 +85,7 @@ def get_xy_position() -> tuple[int, int]:
     y = int(float(y)/10)
     return (x,y)
 
-@log_command
+# @log_command
 def move_to_z(z: int, speed: int = 4) -> int:
     """
     z: int
@@ -113,7 +112,7 @@ def move_to_z(z: int, speed: int = 4) -> int:
         return cmd_string
     
 
-@log_command
+# @log_command
 def move_to_home() -> str:
     '''
     Convenience function to replace the less clear "H" function.
@@ -121,7 +120,7 @@ def move_to_home() -> str:
 
     return 'H'
 
-@log_command
+# @log_command
 def wait_until_movement_completes(sleep_time: float = 0.1) -> None:
     """
     Queries the current status of the motors. If any of them are running, sleeps for sleep_time seconds.
@@ -131,7 +130,7 @@ def wait_until_movement_completes(sleep_time: float = 0.1) -> None:
     return
 
 
-@log_command
+# @log_command
 def go_to_well(nx: int, ny: int) -> str:
     """
     Go to well, numbered by x and y indices.
@@ -187,7 +186,7 @@ def go_to_well(nx: int, ny: int) -> str:
     cmd_string = move_to_xy(x,y)
     return cmd_string
 
-@log_command
+# @log_command
 def go_to_drain(execute: bool = False) -> tuple[str, str]:
 
     cmd_str = move_to_xy(68,2)
@@ -200,7 +199,7 @@ def go_to_drain(execute: bool = False) -> tuple[str, str]:
 
     return cmd_str, z_str
 
-@log_command
+# @log_command
 def go_to_needle_rinse(z_height=135, execute: bool = False) -> tuple[str, str]:
     cmd_str = move_to_xy(83,2)
     if z_height == 'top':
@@ -217,11 +216,13 @@ def main():
     run(move_to_home())
     # run('H')
     wait_until_movement_completes()
-    run(go_to_needle_rinse(execute=False))
+    run(go_to_needle_rinse())
     wait_until_movement_completes()
 
     run(move_to_home())
     wait_until_movement_completes()
+
+    # save_log_entries()
 
     return
 

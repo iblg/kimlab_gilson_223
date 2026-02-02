@@ -1,6 +1,5 @@
 from basic_gsioc import run
 from time import sleep
-from logging import log_command, save_log_entries
 ############################################################
 # This code requires a 32-bit distribution of python to work.
 # On the Kim Lab Lenovo, this is activated by running
@@ -14,7 +13,6 @@ from logging import log_command, save_log_entries
 
 PUMP_ID = 30
 
-@log_command
 def set_pump_to_mode(mode: str, execute: bool = False, unit_id: int = 30) -> str:
     """
     Set pump to either keypad or remote mode
@@ -51,7 +49,6 @@ def set_pump_to_mode(mode: str, execute: bool = False, unit_id: int = 30) -> str
     return cmd_str
 
 
-@log_command
 def set_pump_rpm(rpm: float, execute: bool = False, unit_id: int = 30) -> str:
     """
     Docstring for set_pump_rpm
@@ -74,7 +71,6 @@ def set_pump_rpm(rpm: float, execute: bool = False, unit_id: int = 30) -> str:
     cmd_str = 'R{}'.format(int(hundredths))
     return cmd_str
 
-@log_command
 def pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
     """
     Docstring for fire_pump
@@ -126,23 +122,30 @@ def pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
     
     return cmd_str
 
-@log_command
+
 def stop_pump():
     return 'KH'
 
 def main():
+    # Set pump to remote mode
     run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
+
+    # Set pump rpm and direction
     run(set_pump_rpm(20), unit_id=PUMP_ID)
-    run(pump('ccw'))
-    run('K<', unit_id=PUMP_ID, show_response=True, show_command_sent=True)
-    sleep(5)
-    run('V1')
-    sleep(5)
-    run('V0')
-    sleep(20)
-    run('KH', unit_id=PUMP_ID)
+    # run(pump('ccw'))
+
+    run('K<', unit_id=PUMP_ID,)
+
+    # sleep(5)
+    # run('V1')
+    # sleep(5)
+    # run('V0')
+    # sleep(20)
+
+    # Stop
+    # run('KH', unit_id=PUMP_ID)
+    run(stop_pump(), unit_id=PUMP_ID)
     run(set_pump_to_mode('keypad'), unit_id=PUMP_ID)
-    save_log_entries()
     return
 
 if __name__ == '__main__':

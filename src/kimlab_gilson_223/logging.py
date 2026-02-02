@@ -5,6 +5,9 @@ import functools
 
 # Global log entries list
 log_entries = []
+now = datetime.datetime.now()
+filename = 'C:/Users/uvcom/OneDrive/Desktop/gilson223_logs/'+ now.strftime("%Y-%m-%d_%H-%M-%S") + ".csv"
+print(f"Log will be saved to {filename}\n")
 
 # Define the decorator
 def log_command(func):
@@ -27,15 +30,17 @@ def log_command(func):
         # Append the log entry to the global log entries list
         log_entries.append(log_entry)
         
+        save_log_entries(filename)
         return response
     
     return wrapper_log_command
 
-def save_log_entries():
+def save_log_entries(filename, verbose: bool = False):
     """Save the log entries to a CSV file."""
     # Get the current date and time for the filename
-    now = datetime.datetime.now()
-    filename = 'C:/Users/uvcom/OneDrive/Desktop/gilson223_logs/'+ now.strftime("%Y-%m-%d_%H-%M-%S") + ".csv"
+    # if filename == None:
+    #     now = datetime.datetime.now()
+    #     filename = 'C:/Users/uvcom/OneDrive/Desktop/gilson223_logs/'+ now.strftime("%Y-%m-%d_%H-%M-%S") + ".csv"
     
     # Write the log entries to a CSV file
     with open(filename, mode='w', newline='') as file:
@@ -46,4 +51,5 @@ def save_log_entries():
         for entry in log_entries:
             writer.writerow(entry)
     
-    print(f"Log saved to {filename}")
+    if verbose:
+        (f"Log saved to {filename}")
