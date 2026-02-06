@@ -3,6 +3,8 @@ from minipuls_pump import pump, set_pump_rpm, set_pump_to_mode, stop_pump
 from time import sleep
 from logging import log_command, save_log_entries
 from datetime import datetime
+from racks_4x22 import go_to_well
+from move import go_to_needle_rinse, wait_until_movement_completes, move_z_to_top, move_to_z
 
 @log_command
 def set_valve(direction: str | int, execute: bool = False, unit_id: int = 10):
@@ -60,28 +62,39 @@ def set_valve(direction: str | int, execute: bool = False, unit_id: int = 10):
 
     return cmd_str
 
+PUMP_ID = 30
 def main():
-    # log_entries = []
-    now = datetime.now()
+    # run('H')
+    # run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
+    # run('KH')
+    # run(set_pump_rpm(45), unit_id=PUMP_ID)
 
-    # path_to_file = Path('~/OneDrive/Desktop/gilson223_logs')
-    filename = now.strftime("%Y-%m-%d_%H-%M-%S") + '.csv'
-    path_to_file = 'C:/Users/uvcom/OneDrive/Desktop/gilson223_logs/' + filename
+    
+    # run(set_valve('toward'))
 
+    # sleep_time = 10
 
-    sleep_time = 3
-    PUMP_ID = 30
-    run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
-    run(set_pump_rpm(20), unit_id=PUMP_ID)
-    run(pump('f'), unit_id=30)
-    run(set_valve('away'))
-    run(set_valve(0))
-    sleep(sleep_time)
-    run(set_valve('toward'))
-    sleep(sleep_time)
+    # # rinse for 90 seconds
+    # run(go_to_needle_rinse())
+    # wait_until_movement_completes()
+    # run(pump('f'), unit_id=30)
+    # sleep(sleep_time)
+    # run(move_z_to_top())
+    # run(set_valve('away'))
+    # sleep(3)
+    # wait_until_movement_completes()
+    # run(go_to_well(1,1))
+    # run(move_to_z(100))
+    # run(set_valve('toward'))
+    # sleep(sleep_time)
+
+    # # stop pump
+    # run('KH', unit_id=PUMP_ID)
+    # run(set_pump_to_mode('manual'))
+
+    # # send autosampler home
+    # run('H')
     run('KH', unit_id=PUMP_ID)
-    run(set_pump_to_mode('manual'))
-    save_log_entries()
     
     return
 

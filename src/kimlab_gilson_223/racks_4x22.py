@@ -4,7 +4,7 @@
 ########################################################
 from move import move_to_xy
 
-def go_to_well(nx: int, ny: int) -> str:
+def go_to_well(nx: int, ny: int, speed=4) -> str:
     """
     Docstring for go_to_well
     Go to well number, numbered by x and y indices.
@@ -71,5 +71,5 @@ def go_to_well(nx: int, ny: int) -> str:
     x = int(get_x_from_index(nx))
     y = int(get_y_from_index(ny))
 
-    cmd_string = move_to_xy(x,y)
+    cmd_string = move_to_xy(x,y, speed=speed)
     return cmd_string
