@@ -3,12 +3,15 @@
 ///////////////////////////////////////////////////////////////
 color([1,0,0]){
 //    liquid_cone();
+    union(){
     drain();
+        part();
+    }
    
 }
-color([0,0,1]){
-    top_cube();
-}
+//color([0,0,1]){
+//    part();
+//}
 
 color([1,1,0]){
 inst();
@@ -47,9 +50,9 @@ catchment_x = gap_y - epsilon;
 catchment_y = gap_y + bar_y;
 catchment_z = clearance_above_bar - 2;
 
-cone_top_diam = gap_y - 3*wall_width;
+cone_top_diam = gap_y - 5*wall_width;
 cone_bottom_diam = outlet_hole_diam;
-cone_height = 2*bar_z;
+cone_height = bar_z;
 ///////////////////////////////////////////////////////////////
 // SUB MODULES
 ///////////////////////////////////////////////////////////////
@@ -64,7 +67,9 @@ module hook() {
     }
 
 }
-module top_cube(){
+module part(){
+    difference(){
+    
     union(){
     translate([bar_hole_x - catchment_x/2, 0, 0]){
     hook();
@@ -72,20 +77,24 @@ module top_cube(){
     }
     translate([bar_hole_x, gap_y + bar_y/2, -bar_z + epsilon]) bar_hole_plug();
     }
+    translate([bar_hole_x, gap_y/2, -epsilon])
+    cylinder(h=bar_z*2, d=cone_top_diam);
+}
 }
 module bar_hole_plug(){
     scale([0.95, 0.95, 1]) cylinder(d=bar_hole_diam, h=bar_z + 2*epsilon);
 ;
 }
 module drain() {
+    translate([bar_hole_x,gap_y/2,-cone_height + 1]){
     difference(){
         translate([0,0,-outlet_hole_height])
         cylinder(h=cone_height + outlet_hole_height-3*epsilon, d2=cone_top_diam*1.1, d1=cone_top_diam);
-        translate([0,0,-2*epsilon])
-        liquid_cone();
+        translate([0,0,-2*epsilon]) liquid_cone();
         hole_for_adapter();
     }
     
+}
 }
 module liquid_cone(){
     cylinder(d2 = cone_top_diam, d1 = cone_bottom_diam, h=cone_height);
