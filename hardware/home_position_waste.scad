@@ -2,8 +2,12 @@
 // MAIN MODULE
 ///////////////////////////////////////////////////////////////
 color([1,0,0]){
-    liquid_cone();
-    hole_for_adapter();
+//    liquid_cone();
+    drain();
+   
+}
+color([0,0,1]){
+    top_cube();
 }
 
 color([1,1,0]){
@@ -15,7 +19,7 @@ bar();
 // ALL UNITS IN MM
 ///////////////////////////////////////////////////////////////
 $fn = 100;
-wall_width = 2;
+wall_width = 1;
 gap_y = 16.6; // gap in y between bar and instrument
 
 bar_z_offset = 6.6; // the height of the instrument wall with respect to the top of the bar
@@ -39,6 +43,9 @@ clearance_above_bar = 4.6;
 epsilon = 0.2; // extra length so renders differences visibly
 bar_hole_x = 20;
 
+catchment_x = gap_y - epsilon;
+catchment_y = gap_y + bar_y;
+catchment_z = clearance_above_bar - 2;
 
 cone_top_diam = gap_y - 3*wall_width;
 cone_bottom_diam = outlet_hole_diam;
@@ -47,8 +54,43 @@ cone_height = 2*bar_z;
 // SUB MODULES
 ///////////////////////////////////////////////////////////////
 
+module hook() {
+//    cube([catchment_x, 2*wall_width, bar_z_offset+2*wall_width]);
+    difference(){
+    translate([0,-2*wall_width-inst_y,0])
+      cube([catchment_x, 4*wall_width+inst_y, bar_z_offset+2*wall_width]);
+        scale([1,1.05,1])
+      inst();
+    }
+
+}
+module top_cube(){
+    union(){
+    translate([bar_hole_x - catchment_x/2, 0, 0]){
+    hook();
+    cube([catchment_x, catchment_y, catchment_z]);
+    }
+    translate([bar_hole_x, gap_y + bar_y/2, -bar_z + epsilon]) bar_hole_plug();
+    }
+}
+module bar_hole_plug(){
+    scale([0.95, 0.95, 1]) cylinder(d=bar_hole_diam, h=bar_z + 2*epsilon);
+;
+}
+module drain() {
+    difference(){
+        translate([0,0,-outlet_hole_height])
+        cylinder(h=cone_height + outlet_hole_height-3*epsilon, d2=cone_top_diam*1.1, d1=cone_top_diam);
+        translate([0,0,-2*epsilon])
+        liquid_cone();
+        hole_for_adapter();
+    }
+    
+}
 module liquid_cone(){
     cylinder(d2 = cone_top_diam, d1 = cone_bottom_diam, h=cone_height);
+    hole_for_adapter();
+
 }
 
 module hole_for_adapter(){
