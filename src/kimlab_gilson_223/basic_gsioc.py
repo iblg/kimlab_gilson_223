@@ -21,6 +21,7 @@ import sys
 import ctypes
 from ctypes import *
 from time import sleep
+from datetime import datetime
 
 #-----------------------------------------------------------------------
 # Returns the dll version from the Gsioc32.dll
@@ -62,7 +63,7 @@ def immediate(unitid, command):
 
 		# convert the incoming command to UTF-8 bytestring
 		command = command.encode('utf-8')
-		print(f"Unit ID: {unitid} received immediate command: {command}.")
+		# print(f"Unit ID: {unitid} received immediate command: {command}.")
 
 		# execute the call into the Gsioc32.dll
 		icmd(unitid, command, rsp, rsplen)
@@ -90,7 +91,7 @@ def buffered(unitid, command):
 
 		# convert the incoming command to UTF-8 bytestring
 		command = command.encode('utf-8')
-		print(f"Unit ID: {unitid} received buffered command: {command}.")
+		# print(f"Unit ID: {unitid} received buffered command: {command}.")
 
 		# execute the call into the Gsioc32.dll
 		bcmd(unitid, command, rsp, rsplen)
@@ -123,11 +124,13 @@ def buffered(unitid, command):
 #   argv[3] is the command
 # main(sys.argv[1], int(sys.argv[2]), sys.argv[3])
 
+from logging import log_command, save_log_entries
+
+@log_command
 def run(cmd: str | tuple[str], 
 		cmd_type: str = 'b', 
 		unit_id: int = 10, 
-		show_command_sent: bool = False, 
-		show_response: bool = True, 
+		verbose: bool = True, 
 		sleep_before: float = 0.5):
 	"""
 	Run a command, or a tuple of commands
@@ -152,8 +155,8 @@ def run(cmd: str | tuple[str],
 	sleep_before: float, default 0.5
 	The time (in seconds) to wait before running the command. This is done to prevent crashes and miscommunications.
 	"""
-	print('sleeping {} seconds'.format(sleep_before))
-	sleep(sleep_before)
+	# print('sleeping {} seconds'.format(sleep_before))
+	sleep(sleep_before)	
 
 
 	def check_command_type(cmd_type):
@@ -187,11 +190,9 @@ def run(cmd: str | tuple[str],
 	else:
 		pass
 
-	if show_command_sent:
-		print('Command input: cmd = {}, cmd_type: {}, unit_id: {}'.format(cmd, cmd_type, unit_id))
-	
-	if show_response:
-		print(str(resp))
+	if verbose:
+		now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+		print(now, str(cmd), str(resp))
 
 	return resp
 

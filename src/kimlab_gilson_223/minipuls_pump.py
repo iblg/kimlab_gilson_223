@@ -12,7 +12,6 @@ from time import sleep
 # Note: The unit ID for the pump is 30 by default
 ############################################################
 
-PUMP_ID = '30 312V3.1.2.0'
 PUMP_ID = 30
 
 def set_pump_to_mode(mode: str, execute: bool = False, unit_id: int = 30) -> str:
@@ -34,13 +33,15 @@ def set_pump_to_mode(mode: str, execute: bool = False, unit_id: int = 30) -> str
     """
     mode = mode.lower()
 
+    remote_strs = ['remote', 'computer', 'gsioc']
+    keypad_strs = ['keypad', 'manual', 'local']
     cmd_str = 'S'
-    if mode == 'remote':
+    if mode in remote_strs:
         cmd_str += 'R'
-    elif mode == 'keypad':
+    elif mode in keypad_strs:
         cmd_str += 'K'
     else:
-        print('Invalid mode. Valid modes are \"remote\" or \"keypad\"')
+        print('Invalid mode. Valid modes are {}'.format(remote_strs + keypad_strs))
         return None
 
     if execute:
@@ -71,9 +72,9 @@ def set_pump_rpm(rpm: float, execute: bool = False, unit_id: int = 30) -> str:
     cmd_str = 'R{}'.format(int(hundredths))
     return cmd_str
 
-def run_pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
+def pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
     """
-    Docstring for run_pump
+    Docstring for fire_pump
     
     :param direction: Direction in which you wish to run the pump. 
     Acceptable values are 
@@ -93,8 +94,8 @@ def run_pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
     :return: cmd_str, the command string
     :rtype: str
     """
-    forward_strings = ['f', 'forward', 'cw', 'clockwise', '>']
-    reverse_strings = ['r', 'reverse', 'b', 'backward', 'ccw', 'counterclockwise', '<']
+    forward_strings = ['f', 'forward', 'clockwise', '>']
+    reverse_strings = ['r', 'reverse', 'b', 'backward', 'counterclockwise', '<']
     acceptable_strings = forward_strings + reverse_strings
     def check_direction():
         if direction in acceptable_strings:
@@ -109,7 +110,12 @@ def run_pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
     else:
         return
     
-    cmd_str = 'K' + direction
+    cmd_str = 'K'
+    if direction in forward_strings:
+        cmd_str += '<'
+    else:
+        cmd_str += '>'
+    
 
     
     if execute:
@@ -117,12 +123,29 @@ def run_pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
     
     return cmd_str
 
+
+def stop_pump():
+    return 'KH'
+
 def main():
+    # Set pump to remote mode
     run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
-    run(set_pump_rpm(10), unit_id=PUMP_ID)
-    run('K>', unit_id=PUMP_ID, show_response=True, show_command_sent=True)
-    sleep(10)
-    run('KH', unit_id=PUMP_ID)
+
+    # Set pump rpm and direction
+    run(set_pump_rpm(20), unit_id=PUMP_ID)
+    # run(pump('ccw'))
+
+    run('K<', unit_id=PUMP_ID,)
+
+    # sleep(5)
+    # run('V1')
+    # sleep(5)
+    # run('V0')
+    # sleep(20)
+
+    # Stop
+    # run('KH', unit_id=PUMP_ID)
+    run(stop_pump(), unit_id=PUMP_ID)
     run(set_pump_to_mode('keypad'), unit_id=PUMP_ID)
     return
 
