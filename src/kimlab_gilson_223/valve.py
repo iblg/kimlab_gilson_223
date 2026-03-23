@@ -1,10 +1,6 @@
 from kimlab_gilson_223.basic_gsioc import run
-from kimlab_gilson_223.minipuls_pump import pump, set_pump_rpm, set_pump_to_mode, stop_pump
-from time import sleep
-from kimlab_gilson_223.logging import log_command, save_log_entries
+from kimlab_gilson_223.logging import log_command
 from datetime import datetime
-from kimlab_gilson_223.racks_4x22 import go_to_well_nx_ny
-from kimlab_gilson_223.move import go_to_needle_rinse, wait_until_movement_completes, move_z_to_top, move_to_z
 
 @log_command
 def set_valve(direction: str | int, execute: bool = False, unit_id: int = 10):
@@ -61,42 +57,3 @@ def set_valve(direction: str | int, execute: bool = False, unit_id: int = 10):
         run(cmd_str, unit_id=unit_id)
 
     return cmd_str
-
-PUMP_ID = 30
-def main():
-    # run('H')
-    # run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
-    # run('KH')
-    # run(set_pump_rpm(45), unit_id=PUMP_ID)
-
-    
-    # run(set_valve('toward'))
-
-    # sleep_time = 10
-
-    # # rinse for 90 seconds
-    # run(go_to_needle_rinse())
-    # wait_until_movement_completes()
-    # run(pump('f'), unit_id=30)
-    # sleep(sleep_time)
-    # run(move_z_to_top())
-    # run(set_valve('away'))
-    # sleep(3)
-    # wait_until_movement_completes()
-    # run(go_to_well(1,1))
-    # run(move_to_z(100))
-    # run(set_valve('toward'))
-    # sleep(sleep_time)
-
-    # # stop pump
-    # run('KH', unit_id=PUMP_ID)
-    # run(set_pump_to_mode('manual'))
-
-    # # send autosampler home
-    # run('H')
-    run('KH', unit_id=PUMP_ID)
-    
-    return
-
-if __name__ == '__main__':
-    main()
