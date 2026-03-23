@@ -1,4 +1,4 @@
-from basic_gsioc import run
+from kimlab_gilson_223.basic_gsioc import run
 from time import sleep
 
 ############################################################
@@ -74,7 +74,7 @@ def set_pump_rpm(rpm: float, execute: bool = False, unit_id: int = 30) -> str:
 
 def pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
     """
-    Docstring for fire_pump
+    Docstring for pump
     
     :param direction: Direction in which you wish to run the pump. 
     Acceptable values are 
@@ -94,8 +94,8 @@ def pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
     :return: cmd_str, the command string
     :rtype: str
     """
-    forward_strings = ['f', 'forward', 'clockwise', '>']
-    reverse_strings = ['r', 'reverse', 'b', 'backward', 'counterclockwise', '<']
+    reverse_strings = ['f', 'forward', 'clockwise', '>']
+    forward_strings = ['r', 'reverse', 'b', 'backward', 'counterclockwise', '<']
     acceptable_strings = forward_strings + reverse_strings
     def check_direction():
         if direction in acceptable_strings:

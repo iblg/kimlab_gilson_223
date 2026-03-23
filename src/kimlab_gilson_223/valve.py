@@ -1,10 +1,10 @@
-from basic_gsioc import run
-from minipuls_pump import pump, set_pump_rpm, set_pump_to_mode, stop_pump
+from kimlab_gilson_223.basic_gsioc import run
+from kimlab_gilson_223.minipuls_pump import pump, set_pump_rpm, set_pump_to_mode, stop_pump
 from time import sleep
-from logging import log_command, save_log_entries
+from kimlab_gilson_223.logging import log_command, save_log_entries
 from datetime import datetime
-from racks_4x22 import go_to_well
-from move import go_to_needle_rinse, wait_until_movement_completes, move_z_to_top, move_to_z
+from kimlab_gilson_223.racks_4x22 import go_to_well_nx_ny
+from kimlab_gilson_223.move import go_to_needle_rinse, wait_until_movement_completes, move_z_to_top, move_to_z
 
 @log_command
 def set_valve(direction: str | int, execute: bool = False, unit_id: int = 10):
