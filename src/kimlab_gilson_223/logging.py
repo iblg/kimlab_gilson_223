@@ -35,7 +35,6 @@ def log_command(func):
     
     return wrapper_log_command
 
-
 def save_log_entries(filename, verbose: bool = False):
     """Save the log entries to a CSV file."""
     # Get the current date and time for the filename
