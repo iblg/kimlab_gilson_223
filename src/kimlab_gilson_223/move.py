@@ -1,4 +1,4 @@
-from basic_gsioc import run
+from kimlab_gilson_223.basic_gsioc import run
 from time import sleep
 ######################
 # This code requires a 32-bit distribution of python to work.
@@ -13,7 +13,7 @@ def get_motor_statuses():
     return status
 
 
-def move_to_xy(x: int, y: int, move_z_to_top_before_running: bool = True) -> str:
+def move_to_xy(x: int, y: int, move_z_to_top_before_running: bool = True, speed:int = 4) -> str:
     """
     x: desired x location, in mm
     y: desired y location, in mm
@@ -54,6 +54,7 @@ def move_to_xy(x: int, y: int, move_z_to_top_before_running: bool = True) -> str
     if y == 0:
         y = '000'
 
+    #### TO DO: INCORPORATE SPEED INTO CMD STRING
     cmd_string = 'X' + str(x) + '0/' + str(y) + '0' # convert into tenths of millimeters (hence the extra zeros) and return the string.
     return cmd_string
 

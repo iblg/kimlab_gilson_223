@@ -124,7 +124,7 @@ def buffered(unitid, command):
 #   argv[3] is the command
 # main(sys.argv[1], int(sys.argv[2]), sys.argv[3])
 
-from logging import log_command, save_log_entries
+from kimlab_gilson_223.logging import log_command, save_log_entries
 
 @log_command
 def run(cmd: str | tuple[str], 
