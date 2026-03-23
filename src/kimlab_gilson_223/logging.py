@@ -3,12 +3,12 @@ import csv
 import datetime
 import functools
 import re
+
 # Global log entries list
 log_entries = []
 now = datetime.datetime.now()
 filename = 'C:/Users/uvcom/OneDrive/Desktop/gilson223_logs/'+ now.strftime("%Y-%m-%d_%H-%M-%S") + ".csv"
 print(f"\nLog will be saved to \n{filename}\n")
-
 
 
 # Define the decorator
@@ -22,7 +22,7 @@ def log_command(func):
         # Call the original function and get the response
         response = func(*args, **kwargs)
         
-        # Log the command, response, and timestamp
+        # Log the command, response, timestamp, and description
         log_entry = {
             'timestamp': timestamp,
             'command': args[0],  # Assuming the command is the first argument
