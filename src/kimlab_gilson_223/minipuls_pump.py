@@ -72,16 +72,16 @@ def set_pump_rpm(rpm: float, execute: bool = False, unit_id: int = 30) -> str:
     cmd_str = 'R{}'.format(int(hundredths))
     return cmd_str
 
-def pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
+def pump(direction: str = 'clockwise', execute: bool = False, unit_id: int = 30):
     """
     Docstring for pump
     
     :param direction: Direction in which you wish to run the pump. 
     Acceptable values are 
-    'f', 'forward', 'cw', 'clockwise', '>' for forward running
+    'f', 'forward', 'cw', 'clockwise', '>' for clockwise running
     and 
     'r', 'reverse', 'b', 'backward', 'ccw', 'counterclockwise', '<'
-    for reverse running
+    for counterclockwise running
     :type direction: str
 
     :param execute: Default False. If False, function will return the command string.
@@ -94,9 +94,9 @@ def pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
     :return: cmd_str, the command string
     :rtype: str
     """
-    reverse_strings = ['f', 'forward', 'clockwise', '>']
-    forward_strings = ['r', 'reverse', 'b', 'backward', 'counterclockwise', '<']
-    acceptable_strings = forward_strings + reverse_strings
+    cw_strings = ['f', 'forward', 'clockwise', '>']
+    ccw_strings = ['r', 'reverse', 'b', 'backward', 'counterclockwise', '<']
+    acceptable_strings = cw_strings + ccw_strings
     def check_direction():
         if direction in acceptable_strings:
             return True
@@ -111,7 +111,7 @@ def pump(direction: str = 'f', execute: bool = False, unit_id: int = 30):
         return
     
     cmd_str = 'K'
-    if direction in forward_strings:
+    if direction in ccw_strings:
         cmd_str += '<'
     else:
         cmd_str += '>'
