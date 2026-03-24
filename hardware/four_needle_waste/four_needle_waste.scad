@@ -9,6 +9,7 @@ color([1,0,0]){
     }
    
 }
+//drain();
 //
 //color([0,1,1]){
 //    extended_catchment();
@@ -63,7 +64,7 @@ module hook() {
 //    cube([catchment_x, 2*wall_width, bar_z_offset+2*wall_width]);
     difference(){
     translate([0,-2*wall_width-inst_y,0])
-      cube([catchment_x, 4*wall_width+inst_y, bar_z_offset+2*wall_width]);
+      cube([catchment_x, 4*wall_width+inst_y, bar_z_offset+1*wall_width]);
         scale([1,1.05,1])
       inst();
     }
