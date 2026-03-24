@@ -1,6 +1,6 @@
 # kimlab_gilson_223
-
-Here is a quick tutorial on how to locally install the package.
+## Detailed documentation
+Detailed documentation is available at the project Wiki (github.com/iblg/kimlab_gilson_223/wiki)
 
 ## How to install `kimlab_gilson_223` locally
 
