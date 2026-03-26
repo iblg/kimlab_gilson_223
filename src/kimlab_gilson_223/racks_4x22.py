@@ -5,7 +5,7 @@
 from kimlab_gilson_223.move import move_to_xy
 
 def go_to_well_increments_along_y(n: int) -> str:
-    column = 3*((n-1)//11) + 1
+    column = 4*((n-1)//11) + 1
     row = (n-1) % 11 + 1
     cmd_str = go_to_well_nx_ny(column, row)
     return cmd_str
