@@ -16,8 +16,6 @@ def go_to_well_increments_along_y(n: int, n_needles = 1) -> str:
     cmd_str = go_to_well_nx_ny(column, row)
     return cmd_str
 
-def zigzag_increments_along_y(n: int, n_needles=1) -> str:
-
 
 def go_to_well_nx_ny(nx: int, ny: int, speed=4) -> str:
     """
