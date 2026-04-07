@@ -98,25 +98,25 @@ def collect(current_well: int, hplc_sampling_time, icp_ms_sampling_time, toc_sam
     # ICPMS
     # TOC. TOC is collected in two vials
     print(f'Current well is {current_well}')
-    run(go_to_well_increments_along_y(current_well)) # this line is basically "Go to next well"
+    run(go_to_well_increments_along_y(current_well, n_needles=N_NEEDLES)) # this line is basically "Go to next well"
     sleep(0.5)
     collect_hplc(hplc_sampling_time)
     current_well += 1
 
     print(f'Current well is {current_well}')
-    run(go_to_well_increments_along_y(current_well))
+    run(go_to_well_increments_along_y(current_well, n_needles=N_NEEDLES))
     sleep(0.5)
     collect_icp_ms(icp_ms_sampling_time)
     current_well += 1
 
     print(f'Current well is {current_well}')
-    run(go_to_well_increments_along_y(current_well))
+    run(go_to_well_increments_along_y(current_well, n_needles=N_NEEDLES))
     sleep(0.5)
     collect_toc(toc_sampling_time) # toc is collected in two vials, so collect_toc_will automatically do this
     current_well += 1
     
     print(f'Current well is {current_well}')
-    run(go_to_well_increments_along_y(current_well))
+    run(go_to_well_increments_along_y(current_well, n_needles=N_NEEDLES))
     sleep(0.5)
     collect_toc(toc_sampling_time)
     current_well += 1
@@ -127,7 +127,7 @@ def sampling_24h(current_well, hplc_sampling_time, icp_ms_sampling_time, toc_sam
         sleep_time = 3600 * i # convert to seconds
         print(f'Sleeping for {i} hours.')
         sleep(sleep_time)
-        run(go_to_well_increments_along_y(current_well))
+        run(go_to_well_increments_along_y(current_well, n_needles=N_NEEDLES))
         current_well = collect(current_well, hplc_sampling_time, icp_ms_sampling_time, toc_sampling_time)
         run(move_to_xy(0,0))
     current_well = 1
@@ -136,26 +136,29 @@ def sampling_24h(current_well, hplc_sampling_time, icp_ms_sampling_time, toc_sam
 
 WASTE_X, WASTE_Y = 1, 1 # coordinates of waste position
 PUMP_ID = 30 # Pump ID must be 30. Do not change this value when you send a pump command, or pump will not run!
+N_NEEDLES = 4
+
 
 def main():
     #### User-defined parameters
+
     PUMP_DIRECTION = 'counterclockwise'
     pump_rpm = 10
     z_sampling = 180 # dispensing z_height
-    initial_wait_minutes = 0.06 # initial wait time, min
-    n_days = 2
+    initial_wait_minutes = 30 # initial wait time, min
+    n_days = 7
     n_samples_per_day = 2
-    hplc_sampling_time = 225
-    icp_ms_sampling_time = 3000
-    toc_sampling_time = 2250 # TOC time per one IC vial, so time to dispense 10 mL
+    # hplc_sampling_time = 225
+    # icp_ms_sampling_time = 3000
+    # toc_sampling_time = 2250 # TOC time per one IC vial, so time to dispense 10 mL
     current_well = 1
 
 
     #### For testing
-    # hplc_sampling_time = 2
-    # icp_ms_sampling_time = 2
-    # toc_sampling_time = 2 # TOC time per one IC vial, so time to dispense 10 mL
-    # wait_times_hours_testing = [2/3600, 2/3600] #only uncomment this for testing
+    hplc_sampling_time = 225
+    icp_ms_sampling_time = 3000
+    toc_sampling_time = 2250 # TOC time per one IC vial, so time to dispense 10 mL
+    wait_times_hours = [2/3600, 2/3600] #only uncomment this for testing
 
 
     ###### Derived variables
@@ -207,7 +210,7 @@ def main():
     current_well = 1
 
     for day in range(n_days):
-        current_well = sampling_24h(current_well,  hplc_sampling_time, icp_ms_sampling_time, toc_sampling_time, wait_times_hours=wait_times_hours_testing) # make sure to update the current well, or it will not increase
+        current_well = sampling_24h(current_well,  hplc_sampling_time, icp_ms_sampling_time, toc_sampling_time, wait_times_hours=wait_times_hours) # make sure to update the current well, or it will not increase
 
     run(move_to_waste(WASTE_X, WASTE_Y))
     run(stop_pump(), unit_id=PUMP_ID)

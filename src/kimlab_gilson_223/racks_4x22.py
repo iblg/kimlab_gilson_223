@@ -4,11 +4,20 @@
 ########################################################
 from kimlab_gilson_223.move import move_to_xy
 
-def go_to_well_increments_along_y(n: int) -> str:
-    column = 4*((n-1)//11) + 1
-    row = (n-1) % 11 + 1
+def go_to_well_increments_along_y(n: int, n_needles = 1) -> str:
+    """
+    This is a special function that was devised for a four-needle in parallel experiments.
+    When it reaches the end of a column, it moves four rows over
+    n = well number
+
+    """
+    column = n_needles * ((n - 1) // 11) + 1
+    row = (n - 1) % 11 + 1
     cmd_str = go_to_well_nx_ny(column, row)
     return cmd_str
+
+def zigzag_increments_along_y(n: int, n_needles=1) -> str:
+
 
 def go_to_well_nx_ny(nx: int, ny: int, speed=4) -> str:
     """
