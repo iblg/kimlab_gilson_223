@@ -55,6 +55,12 @@ def parse_command(cmd: str)-> str:
         description = 'Setting pump to remote mode.'
     elif cmd == 'SK':
         description = 'Setting pump to keypad mode.'
+    elif cmd == 'M': # 
+        description = 'Getting motor statuses.' # Note: since the wait_until_movement_completes function uses the 'M' command, this will be logged a lot when waiting for movement to complete.
+    elif re.search(r'R\d+', cmd):
+        rpm = cmd.split('R')[1]
+        rpm = int(rpm)
+        description = f'Set pump rpm to {rpm/100}.'
     elif re.search(r'Z\d+', cmd):
         z = cmd.split('Z')[1]
         if ',' in z:
