@@ -1,10 +1,14 @@
+from kimlab_gilson_223.shutdown import shutdown
 from kimlab_gilson_223.basic_gsioc import run
-from kimlab_gilson_223.move import move_to_home, move_to_xy, move_z_to_top, move_to_z, wait_until_movement_completes
-from kimlab_gilson_223.racks_4x22 import go_to_well_increments_along_y, zigzag_increments_along_y, go_to_well_nx_ny
+from kimlab_gilson_223.move import move_to_home, move_to_xy, move_z_to_top, move_to_z, wait_until_movement_completes, go_to_needle_rinse
+from kimlab_gilson_223.racks_4x22 import go_to_well_increments_along_y
 from kimlab_gilson_223.minipuls_pump import set_pump_to_mode, set_pump_rpm, pump, stop_pump
+from kimlab_gilson_223.valve import set_valve
 import sys
 import signal
 from time import sleep
+
+from labjack import ljm
 
 ######################################################
 # Python documentation for the autosampler can be found at: 
@@ -62,77 +66,8 @@ def move_to_waste(x: int, y: int) -> str:
     cmd_str = move_to_xy(x, y)
     return cmd_str
 
-def collect_hplc(hplc_sampling_time: int, z_sampling=180) -> None:
-    """
-    Convenience function to increase readability.
-    
-    :param hplc_sampling_time: Description
-    """
-    run(move_to_z(z_sampling))
 
-    sleep(hplc_sampling_time)
-    run(move_z_to_top())
 
-def collect_icp_ms(icp_ms_sampling_time, z_sampling=180) -> None:
-    """
-    Convenience function to increase readability.
-    
-    :param icp_ms_sampling_time: Description
-    """
-    run(move_to_z(z_sampling))
-    sleep(icp_ms_sampling_time)
-    run(move_z_to_top())
-
-def collect_toc(toc_sampling_time: int, z_sampling=180) -> None:
-    """
-    Convenience function to increase readability.
-    
-    :param toc_sampling_time: Description
-    """
-    run(move_to_z(z_sampling))
-    sleep(toc_sampling_time)
-    run(move_z_to_top())
-
-def collect(current_well: int, hplc_sampling_time, icp_ms_sampling_time, toc_sampling_time) -> int:
-    # collect one set of samples. In this case, one sample is hplc, followed by 
-    # ICPMS
-    # TOC. TOC is collected in two vials
-    print(f'Current well is {current_well}')
-    run(go_to_well_increments_along_y(current_well)) # this line is basically "Go to next well"
-    sleep(0.5)
-    collect_hplc(hplc_sampling_time)
-    current_well += 1
-
-    print(f'Current well is {current_well}')
-    run(go_to_well_increments_along_y(current_well))
-    sleep(0.5)
-    collect_icp_ms(icp_ms_sampling_time)
-    current_well += 1
-
-    print(f'Current well is {current_well}')
-    run(go_to_well_increments_along_y(current_well))
-    sleep(0.5)
-    collect_toc(toc_sampling_time) # toc is collected in two vials, so collect_toc_will automatically do this
-    current_well += 1
-    
-    print(f'Current well is {current_well}')
-    run(go_to_well_increments_along_y(current_well))
-    sleep(0.5)
-    collect_toc(toc_sampling_time)
-    current_well += 1
-    return current_well
-
-def sampling_24h(current_well, hplc_sampling_time, icp_ms_sampling_time, toc_sampling_time, wait_times_hours=[12,12]):
-    for i in wait_times_hours:
-        sleep_time = 3600 * i # convert to seconds
-        print(f'Sleeping for {i} hours.')
-        sleep(sleep_time)
-        run(go_to_well_increments_along_y(current_well))
-        current_well = collect(current_well, hplc_sampling_time, icp_ms_sampling_time, toc_sampling_time)
-        run(move_to_xy(0,0))
-    current_well = 1
-
-    return current_well
 
 def print_params():
     print(50*'#')
@@ -155,35 +90,82 @@ def print_params():
     continue_flag = input('DO YOU WANT TO CONTINUE? (y/n)')
     return continue_flag
 
+def flowmeter_calib_2026_04_06():
+    # uses 2026_04_06 calibration of serial number 01842 McMillan 112 flowmeter
+    slope = 20.0744
+    int = 1.8462
+
+    return int, slope
+
+def convert_volts_to_flow(V):
+    int, slope = flowmeter_calib_2026_04_06()
+    return int + slope * V
+
+def collect_vial(sampling_time: int, z_sampling=180) -> None:
+    """
+    Convenience function to increase readability.
+    
+    :param hplc_sampling_time: Description
+    """
+    wait_until_movement_completes()
+    run(move_to_z(z_sampling))
+    run(set_valve('away'))
+
+    sleep(sampling_time)
+    run(set_valve('toward'))
+    run(move_z_to_top())
+
+
+def rinse_needle_and_lines(rinsing_time):
+    run(set_valve('toward'))
+    print('hi')
+    print(set_valve('toward'))
+    run(go_to_needle_rinse()[0])
+    run(go_to_needle_rinse()[1]) # move z direction
+    run(set_valve('away'))
+    sleep(rinsing_time)
+    print('Rinsing for {} seconds'.format(rinsing_time))
+    
+    run(set_valve('toward'))
+    run(move_z_to_top())
+    wait_until_movement_completes()
+
+def collect(current_well: int, sampling_time: float, n_vials=1) -> int:
+
+    # collect one sample
+    for i in range(n_vials):
+        wait_until_movement_completes()
+        run(go_to_well_increments_along_y(current_well)) # this line is basically "Go to next well"
+        collect_vial(sampling_time)
+        current_well += 1
+
+    return current_well
+
 WASTE_X, WASTE_Y = 1, 1 # coordinates of waste position
 PUMP_ID = 30 # Pump ID must be 30. Do not change this value when you send a pump command, or pump will not run!
+N_NEEDLES = 1
 
 def main():
+    # handle = ljm.openS("ANY", "ANY", "ANY")  # For connecting to labjack device, if desired
+    # info = ljm.getHandleInfo(handle) 
+    
     #### User-defined parameters
     PUMP_DIRECTION = 'counterclockwise'
-    PUMP_RPM = 10
+    pump_rpm = 48 # rpm of 48 corresponds to about 46 ml/min
+    flow_rate = 46./60 # flow rate divided by 60 s
+    # sampling_time_per_vial = 10 / flow_rate # time in seconds
+    nsamples = 8
+    sampling_time_per_vial = 4.5 
+    vials_per_sample = 3
+    print(f'Total samples {nsamples}')
+    print(f'Total vials {vials_per_sample*nsamples}')
+    print('Time to ten ml:', sampling_time_per_vial)
+    time_between_samples = 10*60
+    line_flush_time = 5
+    current_well = 7
+
     z_sampling = 180 # dispensing z_height
     initial_wait_minutes = 30 # initial wait time, min
-    
-    # hplc_sampling_time = 225
-    # icp_ms_sampling_time = 3000
-    # toc_sampling_time = 2250 # TOC time per one IC vial, so time to dispense 10 mL
-    current_well = 1
-
-
-    #### For testing
-    hplc_sampling_time = 225
-    icp_ms_sampling_time = 3000
-    toc_sampling_time = 2250 # TOC time per one IC vial, so time to dispense 10 mL
-    wait_times_hours = [2/3600, 2/3600] #only uncomment this for testing
-
-
-    ###### Derived variables
-    # initial_wait = 60*initial_wait_minutes
-    # total_time_per_sample = hplc_sampling_time + icp_ms_sampling_time + 2*toc_sampling_time
-    # wait_time_seconds = (24 * 60 * 60 - n_samples_per_day * total_time_per_sample ) / n_samples_per_day
-    # wait_times_hours = [wait_time_seconds/3600 for i in range(n_samples_per_day)]
-    # estimated_runtime = (n_days * 24 * 3600 + initial_wait) / (24 * 3600)
 
     # # Perform user check to ensure all params are satisfactory
     # continue_flag = print_params()
@@ -192,49 +174,39 @@ def main():
     # else:
     #     print('User aborted the run.')
     #     return
-    
-    run(move_to_home())
-    wait_until_movement_completes()
-    run(move_to_waste(WASTE_X, WASTE_Y))
-    wait_until_movement_completes()
-
-
-    nwells = 15
-    for i in range(1, nwells + 1):
-
-        run(zigzag_increments_along_y(i, n_needles=2))
-        wait_until_movement_completes()
-
-        sleep(1)
-    run(move_to_home())
-    wait_until_movement_completes()
-
-
     # run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
     # run(set_pump_rpm(pump_rpm), unit_id=PUMP_ID)
     # run(pump(direction=PUMP_DIRECTION), unit_id=PUMP_ID)
 
-    # sleep(initial_wait)
-    # current_well = collect(current_well, hplc_sampling_time, icp_ms_sampling_time, toc_sampling_time) # collect initial samples
-    # run(move_to_waste(WASTE_X, WASTE_Y))
-    # current_well = 1
+    run(move_to_home())
+    wait_until_movement_completes()
+    for i in range(nsamples):
+        rinse_needle_and_lines(line_flush_time)
+        current_well = collect(current_well, sampling_time_per_vial, n_vials=vials_per_sample)
+        needle_rinse_str, z_str = go_to_needle_rinse()
+        run(needle_rinse_str)
+        sleep(time_between_samples)
 
-    # for day in range(n_days):
-    #     current_well = sampling_24h(current_well,  hplc_sampling_time, icp_ms_sampling_time, toc_sampling_time, wait_times_hours=wait_times_hours) # make sure to update the current well, or it will not increase
+    run(move_to_home())
+    wait_until_movement_completes()
+    # run(stop_pump(), unit_id = PUMP_ID)
 
-    # run(move_to_waste(WASTE_X, WASTE_Y))
-    # run(stop_pump(), unit_id=PUMP_ID)
-    # print('End')
+    print('End')
 
     return
 
+    
 if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        print('Keyboard interrupt!')
-        print('Stopping pump and moving to waste position.')
-        run(set_pump_to_mode('remote'), unit_id=30)
-        run(move_to_waste(WASTE_X, WASTE_Y))
-        run(stop_pump(), unit_id=PUMP_ID)
-        sys.exit(130)
+    main()
+    # try:
+    #     main()
+    # except TypeError as te:
+    #     print('TypeError', te)
+    # except KeyboardInterrupt as ke:
+    #     print(ke)
+    # except UnboundLocalError as ue:
+    #     print(ue)
+    # finally:
+    #     print('Shutting down pump and homing instrument')
+    #     shutdown()
+        

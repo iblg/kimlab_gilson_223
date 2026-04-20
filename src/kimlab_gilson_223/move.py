@@ -144,15 +144,17 @@ def go_to_drain(execute: bool = False) -> tuple[str, str]:
     return cmd_str, z_str
 
 
-def go_to_needle_rinse(z_height=135, execute: bool = False) -> tuple[str, str]:
+def go_to_needle_rinse(z=135, execute: bool = False) -> tuple[str, str]:
     cmd_str = move_to_xy(83,2)
-    if z_height == 'top':
+    if z == 'top':
         z_str = move_to_z(215, speed=2)
-    z_str = move_to_z(z_height, speed=2)
+    z_str = move_to_z(z, speed=2)
     if execute:
         run(cmd_str)
         wait_until_movement_completes()
         run(z_str)
+        wait_until_movement_completes()
+
     return cmd_str, z_str
 
 

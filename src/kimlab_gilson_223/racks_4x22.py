@@ -74,11 +74,14 @@ def go_to_well_nx_ny(nx: int, ny: int, speed=4) -> str:
     if check_nx():
         pass
     else:
+        print('You tried to get the autosampler to go to a location that is too far in the x direction.')
         return
     
     if check_ny():
         pass
     else:
+        print('You tried to get the autosampler to go to a location that is too far in the y direction.')
+
         return
     
     x = int(get_x_from_index(nx))
