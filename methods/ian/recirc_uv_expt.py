@@ -118,8 +118,6 @@ def collect_vial(sampling_time: int, z_sampling=180) -> None:
 
 def rinse_needle_and_lines(rinsing_time):
     run(set_valve('toward'))
-    print('hi')
-    print(set_valve('toward'))
     run(go_to_needle_rinse()[0])
     run(go_to_needle_rinse()[1]) # move z direction
     run(set_valve('away'))
@@ -155,14 +153,18 @@ def main():
     flow_rate = 46./60 # flow rate divided by 60 s
     # sampling_time_per_vial = 10 / flow_rate # time in seconds
     nsamples = 8
-    sampling_time_per_vial = 4.5 
+    # sampling_time_per_vial = 4.5 
+    sampling_time_per_vial = 1
     vials_per_sample = 3
+    # time_between_samples = 10*60
+    time_between_samples = 3
+
+
     print(f'Total samples {nsamples}')
     print(f'Total vials {vials_per_sample*nsamples}')
     print('Time to ten ml:', sampling_time_per_vial)
-    time_between_samples = 10*60
     line_flush_time = 5
-    current_well = 7
+    current_well = 1
 
     z_sampling = 180 # dispensing z_height
     initial_wait_minutes = 30 # initial wait time, min
