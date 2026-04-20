@@ -94,21 +94,28 @@ def parse_command(cmd: str)-> str:
 
     return description
 
-def save_log_entries(filename, verbose: bool = False):
+def save_log_entries(filename, verbose: bool = False, retries=5, delay=0.2):
     """Save the log entries to a CSV file."""
     # Get the current date and time for the filename
     # if filename == None:
     #     now = datetime.datetime.now()
     #     filename = 'C:/Users/uvcom/OneDrive/Desktop/gilson223_logs/'+ now.strftime("%Y-%m-%d_%H-%M-%S") + ".csv"
-    
-    # Write the log entries to a CSV file
-    with open(filename, mode='w', newline='') as file:
-        fieldnames = ['timestamp', 'command', 'response', 'description']
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+    for attempt in range(retries):
+        try:
+            with open(filename, mode='w', newline='') as file:
+                fieldnames = ['timestamp', 'command', 'response', 'description']
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
         
-        writer.writeheader()
-        for entry in log_entries:
-            writer.writerow(entry)
+                writer.writeheader()
+                for entry in log_entries:
+                    writer.writerow(entry)
+        except PermissionError:
+            if attempt < retries - 1:
+                datetime.sleep(delay)
+            else:
+                print(f"Failed to log after {retries} attempts: {entry}")
+    # Write the log entries to a CSV file
+
     
     if verbose:
         (f"Log saved to {filename}")
