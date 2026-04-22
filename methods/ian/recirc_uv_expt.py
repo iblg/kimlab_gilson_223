@@ -153,11 +153,10 @@ def main():
     flow_rate = 46./60 # flow rate divided by 60 s
     # sampling_time_per_vial = 10 / flow_rate # time in seconds
     nsamples = 8
-    # sampling_time_per_vial = 4.5 
-    sampling_time_per_vial = 1
+    sampling_time_per_vial = 4.5 
+    # sampling_time_per_vial = 1
     vials_per_sample = 3
-    # time_between_samples = 10*60
-    time_between_samples = 3
+    time_between_samples = 10*60
 
 
     print(f'Total samples {nsamples}')

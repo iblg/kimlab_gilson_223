@@ -2,6 +2,7 @@ from kimlab_gilson_223.racks_4x22 import go_to_well_increments_along_y
 from kimlab_gilson_223.basic_gsioc import run
 from kimlab_gilson_223.move import move_to_z,  move_to_home
 from kimlab_gilson_223.minipuls_pump import set_pump_to_mode, set_pump_rpm, pump, stop_pump
+from kimlab_gilson_223.valve import set_valve
 
 import sys
 import signal
@@ -28,8 +29,8 @@ def main():
     # run(move_to_home())
     run(move_to_home())
     # sleep(10)
-
-    run(go_to_well_increments_along_y(8))
+    run(set_valve('toward'))
+    # run(go_to_well_increments_along_y(8))
     # sleep(1)
     # run(move_to_z(180))
     # sleep(180)
