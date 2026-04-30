@@ -3,11 +3,14 @@ import csv
 import datetime
 import functools
 import re
+from pathlib import Path
 
 # Global log entries list
 log_entries = []
 now = datetime.datetime.now()
-filename = 'C:/Users/uvcom/OneDrive/Desktop/gilson223_logs/'+ now.strftime("%Y-%m-%d_%H-%M-%S") + ".csv"
+filename = Path().home() / 'OneDrive - Yale University' / 'kimlab'
+filename = filename / 'vuv' / 'gilson223_logs' / now.strftime("%Y-%m-%d_%H-%M-%S")
+filename = filename.with_suffix('.csv')
 print(f"\nLog will be saved to \n{filename}\n")
 
 
@@ -29,6 +32,9 @@ def log_command(func):
             'response': response,
             'description':parse_command(args[0])
         }
+        print(f'log entry: {log_entry}')
+        
+
         
         # Append the log entry to the global log entries list
         log_entries.append(log_entry)
@@ -39,6 +45,11 @@ def log_command(func):
     return wrapper_log_command
 
 def parse_command(cmd: str)-> str:
+    if isinstance(cmd, str):
+        pass
+    else:
+        cmd = str(cmd)
+
     if cmd == 'H':
         description = 'Moving needle to home position.'
     elif cmd == 'KH':
@@ -61,6 +72,9 @@ def parse_command(cmd: str)-> str:
         rpm = cmd.split('R')[1]
         rpm = int(rpm)
         description = f'Set pump rpm to {rpm/100}.'
+    elif 'sleeping' in cmd.lower():
+        t = t.split('for ')[1].split(' seconds')[0]
+        description = f'Sleeping for {t} seconds'
     elif re.search(r'Z\d+', cmd):
         z = cmd.split('Z')[1]
         if ',' in z:
@@ -85,6 +99,10 @@ def parse_command(cmd: str)-> str:
         x = int(x)/10 # convert into mm
         y = int(y)/10 # convert into mm
         description = f'Moving to position xy = ({x},{y})' + speed_addendum
+    elif cmd == 'toward':
+        description = 'Setting valve toward instrument'
+    elif cmd == 'away':
+        description = 'Setting valve away from instrument'
     else:
         print(f'Command could not be translated into human-friendly format for logging. Command was {cmd}')
         print('Command was still executed\n')
