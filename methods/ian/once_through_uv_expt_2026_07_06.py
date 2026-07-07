@@ -4,6 +4,8 @@ from kimlab_gilson_223.move import move_to_home, move_to_xy, move_z_to_top, move
 from kimlab_gilson_223.racks_4x22 import go_to_well_increments_along_y
 from kimlab_gilson_223.minipuls_pump import set_pump_to_mode, set_pump_rpm, pump, stop_pump
 from kimlab_gilson_223.valve import set_valve
+from kimlab_gilson_223.sleep_and_log import sleep_and_log
+
 import sys
 import signal
 from time import sleep
@@ -111,7 +113,7 @@ def collect_vial(sampling_time: int, z_sampling=180) -> None:
     run(move_to_z(z_sampling))
     run(set_valve('away'))
 
-    sleep(sampling_time)
+    sleep_and_log(sampling_time)
     run(set_valve('toward'))
     run(move_z_to_top())
 
@@ -121,7 +123,7 @@ def rinse_needle_and_lines(rinsing_time):
     run(go_to_needle_rinse()[0])
     run(go_to_needle_rinse()[1]) # move z direction
     run(set_valve('away'))
-    sleep(rinsing_time)
+    sleep_and_log(rinsing_time)
     print('Rinsing for {} seconds'.format(rinsing_time))
     
     run(set_valve('toward'))
@@ -148,27 +150,31 @@ def main():
     # info = ljm.getHandleInfo(handle) 
     
     #### User-defined parameters
-    PUMP_DIRECTION = 'counterclockwise'
-    pump_rpm = 48 # rpm of 48 corresponds to about 46 ml/min
+    PUMP_DIRECTION = 'clockwise'
+    pump_rpm = [48, 24, 12, 6] # rpm of 48 corresponds to about 46 ml/min
     flow_rate = 46./60 # flow rate divided by 60 s
     # sampling_time_per_vial = 10 / flow_rate # time in seconds
-    nsamples = 10
-    sampling_time_per_vial = 4.5 * (100./40.)
+    nsamples = 4
+    sampling_time_per_vial = [20, 40, 80, 160] #48 rpm, 24 rpm, 12 rpm, 6 rpm
     # sampling_time_per_vial = 1
     vials_per_sample = 4
-    time_between_samples = 10*60
-    # initial_wait = 2*60 # two mins initial wait
+    time_between_samples = [i * 20 for i in sampling_time_per_vial] # 20x sampling time per vial = 100 mL
+    # time_between_samples = 20*60
+    initial_wait = 2*60 # two mins initial wait
 
     #########################
     # Testing parameters
     #########################
-    time_between_samples = 3
-    initial_wait = 2
+    # nsamples = 3
+    # vials_per_sample = 2
+    # time_between_samples = 3
+    # initial_wait = 2
+    
 
     print(f'Total samples {nsamples}')
     print(f'Total vials {vials_per_sample*nsamples}')
     print('Time to ten ml:', sampling_time_per_vial)
-    line_flush_time = 5
+    line_flush_time = 20
     current_well = 1
 
     z_sampling = 180 # dispensing z_height
@@ -180,23 +186,38 @@ def main():
     # else:
     #     print('User aborted the run.')
     #     return
-    # run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
-    # run(set_pump_rpm(pump_rpm), unit_id=PUMP_ID)
-    # run(pump(direction=PUMP_DIRECTION), unit_id=PUMP_ID)
 
-    sleep(initial_wait)
+    run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
+    run(set_pump_rpm(pump_rpm[0]), unit_id=PUMP_ID)
+    run(pump(direction=PUMP_DIRECTION), unit_id=PUMP_ID)
+
     run(move_to_home())
     wait_until_movement_completes()
+
+    run(set_valve('toward'))
+    initial_wait = 1
+    sleep_and_log(initial_wait)
+
     for i in range(nsamples):
-        rinse_needle_and_lines(line_flush_time)
-        current_well = collect(current_well, sampling_time_per_vial, n_vials=vials_per_sample)
+        print(f'Sample {i}:')
+        # print(f'Pump rpms: {rpm}')
+
+        rpm = pump_rpm[i]
+        run(set_pump_rpm(rpm), unit_id=PUMP_ID)
+        sleeping_time = time_between_samples[i]
+        sleep_and_log(sleeping_time)
+        
         needle_rinse_str, z_str = go_to_needle_rinse()
         run(needle_rinse_str)
-        sleep(time_between_samples)
+        rinse_needle_and_lines(line_flush_time)
+        st = sampling_time_per_vial[i]
+        current_well = collect(current_well, st, n_vials=vials_per_sample)
+
+
 
     run(move_to_home())
     wait_until_movement_completes()
-    # run(stop_pump(), unit_id = PUMP_ID)
+    run(stop_pump(), unit_id = PUMP_ID)
 
     print('End')
 

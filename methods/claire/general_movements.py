@@ -1,8 +1,8 @@
 from kimlab_gilson_223.racks_4x22 import go_to_well_increments_along_y
 from kimlab_gilson_223.basic_gsioc import run
-from kimlab_gilson_223.move import move_to_z,  move_to_home
+from kimlab_gilson_223.move import move_to_xy, move_to_z,  move_to_home, move_z_to_top, wait_until_movement_completes, get_z_position
 from kimlab_gilson_223.minipuls_pump import set_pump_to_mode, set_pump_rpm, pump, stop_pump
-
+from kimlab_gilson_223.basic_gsioc import immediate
 import sys
 import signal
 from time import sleep
@@ -26,10 +26,20 @@ from time import sleep
 def main():
     # run(set_pump_to_mode('remote'), unit_id=30)
     # run(move_to_home())
+    print(immediate(10,'X'))
+    print(immediate(10, 'Z'))
+    run(move_to_xy(10,10))
     run(move_to_home())
+    # run(wait_until_movement_completes())
+    # run(move_z_to_top())
+    run(move_to_z(95))
+    print(immediate(10, 'X'))
+    print(immediate(10, 'Z'))
+    # print(get_z_position())
+    # run()
     # sleep(10)
 
-    run(go_to_well_increments_along_y(8))
+    # run(go_to_well_increments_along_y(8))
     # sleep(1)
     # run(move_to_z(180))
     # sleep(180)

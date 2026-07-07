@@ -23,6 +23,12 @@ from time import sleep
 #   python this_file_name.py
 ######################################################
 
+def rinse_both_lines(t_rinse):
+    run(set_valve('toward'))
+    sleep(t_rinse)
+    run(set_valve('away'))
+    sleep(t_rinse)
+    return
 
 def main():
     # run(set_pump_to_mode('remote'), unit_id=30)
@@ -34,6 +40,10 @@ def main():
     run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
     run(set_pump_rpm(45), unit_id=PUMP_ID)
     run('K>', unit_id=PUMP_ID,)
+    rinse_both_lines(5)
+    run(set_valve('toward'))
+
+
     sleep(60*60)
     run(stop_pump(), unit_id=PUMP_ID)
     run(set_pump_to_mode('keypad'), unit_id=PUMP_ID)

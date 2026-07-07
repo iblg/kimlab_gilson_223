@@ -4,6 +4,8 @@ from kimlab_gilson_223.move import move_to_home, move_to_xy, move_z_to_top, move
 from kimlab_gilson_223.racks_4x22 import go_to_well_increments_along_y
 from kimlab_gilson_223.minipuls_pump import set_pump_to_mode, set_pump_rpm, pump, stop_pump
 from kimlab_gilson_223.valve import set_valve
+from kimlab_gilson_223.sleep_and_log import sleep_and_log
+
 import sys
 import signal
 from time import sleep
@@ -152,18 +154,19 @@ def main():
     pump_rpm = 48 # rpm of 48 corresponds to about 46 ml/min
     flow_rate = 46./60 # flow rate divided by 60 s
     # sampling_time_per_vial = 10 / flow_rate # time in seconds
-    nsamples = 10
-    sampling_time_per_vial = 4.5 * (100./40.)
+    nsamples = 11
+    sampling_time_per_vial = 15 # setting 40
+    sampling_time_per_vial = 4.5 # setting 100
     # sampling_time_per_vial = 1
     vials_per_sample = 4
-    time_between_samples = 10*60
-    # initial_wait = 2*60 # two mins initial wait
+    time_between_samples = 20*60
+    initial_wait = 2*60 # two mins initial wait
 
     #########################
     # Testing parameters
     #########################
-    time_between_samples = 3
-    initial_wait = 2
+    # time_between_samples = 3
+    # initial_wait = 2
 
     print(f'Total samples {nsamples}')
     print(f'Total vials {vials_per_sample*nsamples}')
@@ -183,16 +186,16 @@ def main():
     # run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
     # run(set_pump_rpm(pump_rpm), unit_id=PUMP_ID)
     # run(pump(direction=PUMP_DIRECTION), unit_id=PUMP_ID)
-
-    sleep(initial_wait)
     run(move_to_home())
+    run(set_valve('toward'))
+    sleep_and_log(initial_wait)
     wait_until_movement_completes()
-    for i in range(nsamples):
+    for i in range(nsamples+1):
         rinse_needle_and_lines(line_flush_time)
         current_well = collect(current_well, sampling_time_per_vial, n_vials=vials_per_sample)
         needle_rinse_str, z_str = go_to_needle_rinse()
         run(needle_rinse_str)
-        sleep(time_between_samples)
+        sleep_and_log(time_between_samples)
 
     run(move_to_home())
     wait_until_movement_completes()

@@ -146,19 +146,20 @@ def main():
     pump_rpm = 10
     z_sampling = 180 # dispensing z_height
     initial_wait_minutes = 30 # initial wait time, min
-    n_days = 7
+    n_days = 30
     n_samples_per_day = 2
-    # hplc_sampling_time = 225
-    # icp_ms_sampling_time = 3000
-    # toc_sampling_time = 2250 # TOC time per one IC vial, so time to dispense 10 mL
-    current_well = 1
-
-
-    #### For testing
     hplc_sampling_time = 225
     icp_ms_sampling_time = 3000
     toc_sampling_time = 2250 # TOC time per one IC vial, so time to dispense 10 mL
-    wait_times_hours = [2/3600, 2/3600] #only uncomment this for testing
+    current_well = 1
+
+    #### For testing
+    # hplc_sampling_time = 225
+    # icp_ms_sampling_time = 3000
+    # toc_sampling_time = 2250 # TOC time per one IC vial, so time to dispense 10 mL
+    # wait_times_hours = [2/3600, 2/3600] #only uncomment this for testing
+    ################## End testing zone
+  
 
 
     ###### Derived variables
@@ -225,6 +226,8 @@ if __name__ == '__main__':
         print('Keyboard interrupt!')
         print('Stopping pump and moving to waste position.')
         run(set_pump_to_mode('remote'), unit_id=30)
+        run(move_z_to_top())
+       # wait
         run(move_to_waste(WASTE_X, WASTE_Y))
         run(stop_pump(), unit_id=PUMP_ID)
         sys.exit(130)

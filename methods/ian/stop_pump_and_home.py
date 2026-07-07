@@ -32,13 +32,9 @@ def main():
 
     PUMP_ID = 30
     run(set_pump_to_mode('remote'), unit_id=PUMP_ID)
-    run(set_pump_rpm(45), unit_id=PUMP_ID)
-    run('K>', unit_id=PUMP_ID,)
-    sleep(60*60)
     run(stop_pump(), unit_id=PUMP_ID)
     run(set_pump_to_mode('keypad'), unit_id=PUMP_ID)
 
-    run(move_to_home())
     sleep(1)
 
 
