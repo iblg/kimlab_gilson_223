@@ -3,7 +3,7 @@ $fn=60; //set the number of facets to 60
 
 attachment_x = 11.8; // nominally about 12 mm. In practice a little smaller is needed.
 attachment_y = 4;
-attachment_z = 52;
+attachment_z = 60;
 
 attachment_hole_length = 5*attachment_y;
 
@@ -78,7 +78,7 @@ module needle_holder(){
 //        holes_for_needles();
         union(){
             needle_holder_body();
-            guide_for_needles();
+//            guide_for_needles();
 
         }
         holes_for_needles();

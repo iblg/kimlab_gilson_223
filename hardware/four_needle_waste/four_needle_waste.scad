@@ -41,7 +41,9 @@ inst_y = 1.6;
 inst_z = 100; //arbitrary height
 
 
-outlet_hole_diam = 6.3;
+//outlet_hole_diam = 6.3; # this one proved a bit too big in practice
+outlet_hole_diam = 6;
+
 outlet_hole_height = 9;
 
 clearance_above_bar = 4.6;
